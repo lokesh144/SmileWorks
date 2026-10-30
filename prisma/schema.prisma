@@ -1,0 +1,49 @@
+// SmileWorks Solutions — enquiry storage.
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+  NOT_CONFIGURED
+}
+
+/// Consultation requests submitted through the public contact form.
+/// Contains personal data — restrict database access accordingly.
+model Enquiry {
+  id                 String             @id @default(cuid())
+  createdAt          DateTime           @default(now()) @map("created_at")
+  fullName           String             @map("full_name") @db.VarChar(100)
+  email              String             @db.VarChar(254)
+  phone              String?            @db.VarChar(30)
+  organization       String             @db.VarChar(150)
+  serviceInterest    String             @map("service_interest") @db.VarChar(64)
+  teamSize           String?            @map("team_size") @db.VarChar(32)
+  message            String             @db.VarChar(2000)
+  consentGivenAt     DateTime           @map("consent_given_at")
+  notificationStatus NotificationStatus @default(PENDING) @map("notification_status")
+
+  @@index([createdAt])
+  @@map("enquiries")
+}
+
+/// Fixed-window counters for rate limiting public endpoints. Keys are
+/// salted SHA-256 hashes — raw IP addresses and emails are never stored.
+model RateLimitBucket {
+  key         String   @db.VarChar(128)
+  windowStart DateTime @map("window_start")
+  count       Int      @default(0)
+
+  @@id([key, windowStart])
+  @@index([windowStart])
+  @@map("rate_limit_buckets")
+}
