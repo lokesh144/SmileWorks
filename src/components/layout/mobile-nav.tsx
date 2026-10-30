@@ -41,7 +41,7 @@ export function MobileNav({ pathname, scrolled }: { pathname: string; scrolled: 
       </SheetTrigger>
       <SheetContent
         side="right"
-        className="surface-dark w-full gap-0 overflow-y-auto border-l border-white/10 p-0 sm:max-w-md"
+        className="w-full gap-0 overflow-y-auto border-l border-white/10 p-0 sm:max-w-md surface-dark bg-black/70"
       >
         <div className="flex h-18 items-center px-5">
           <Logo tone="dark" onNavigate={() => setOpen(false)} />
